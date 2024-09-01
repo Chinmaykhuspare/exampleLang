@@ -1,0 +1,83 @@
+category AttackScenario {
+  
+  // Phishing attack attempted by User
+  User user {
+    attemptPhishing
+      -> phish
+  }
+  
+  // If phishing is successful
+  Password passwords {
+    phish
+      -> obtain
+  }
+  
+  // Password obtained, authenticate to Host
+  Host host {
+    authenticate
+      -> access
+  }
+  
+  // Host gains access to ERP, ePoS, Email, PharmData, NHSmail
+  ERP erpSystem {
+    access
+      -> manageStock
+  }
+  
+  ePoS eposSystem {
+    access
+      -> processTransaction
+  }
+  
+  Email emailSystem {
+    access
+      -> sendEmail
+  }
+  
+  PharmData pharmSystem {
+    access
+      -> accessNHSData
+  }
+  
+  NHSmail nhsmailSystem {
+    access
+      -> sendSecureMessage
+  }
+  
+  // Host uses network to spread ransomware
+  Network pharmacyNetwork {
+    access
+      -> hosts.connect
+  }
+
+  // Ransomware attack on Printer and Fax Machine
+  Printer printer {
+    access
+      -> print
+  }
+  
+  FaxMachine faxMachine {
+    access
+      -> sendFax
+  }
+
+  // DDoS attack initiated from compromised hosts
+  Host compromisedHost {
+    access
+      -> launchDDoS
+  }
+
+  // Network targeted by DDoS
+  Network targetNetwork {
+    launchDDoS
+      -> serviceDisruption
+  }
+}
+
+associations {
+  // Ransomware propagation through network
+  Network [pharmacyNetwork] 1 <-- Infection --> * [infectedHosts] Host
+
+  // DDoS attack propagation from compromised hosts
+  Host [compromisedHost] * <-- DDoSLaunch --> 1 [targetNetwork] Network
+}
