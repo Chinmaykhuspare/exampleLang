@@ -1,0 +1,103 @@
+#id: "org.mal-lang.attack-scenario"
+#version: "1.0.0"
+
+category System {
+  asset Network {
+    | access
+      -> hosts.connect
+    & connect
+  }
+
+  asset Host {
+    | connect
+      -> network.access
+    | access
+      -> authenticate
+    | authenticate
+      -> accessBankingSoftware, accessOfficeSuite, accessProjectManagementSoftware, accessNetwork
+    | accessBankingSoftware
+      -> bankingSoftware.manipulateTransactions
+    | accessOfficeSuite
+      -> officeSuite.communicate
+    | accessProjectManagementSoftware
+      -> projectManagementSoftware.projectInfo
+    | accessNetwork
+      -> deployRansomware
+    | deployRansomware
+      -> ransomwareDeployed
+    | ransomwareDeployed [Exponential(0.5)]
+      -> systemEncryption
+    | guessPassword
+      -> guessedPassword
+    | guessedPassword [Exponential(0.02)]
+      -> authenticate
+    & access
+  }
+
+  asset User {
+    | attemptPhishing
+      -> phishingSuccess
+    | phishingSuccess [Exponential(0.1)]
+      -> passwords.obtain
+    | access
+      -> host.access
+  }
+
+  asset Password {
+    | obtain
+      -> host.authenticate
+  }
+
+  asset BankingSoftware {
+    | manipulateTransactions
+      -> financialDamage
+  }
+
+  asset OfficeSuite {
+    | communicate
+      -> phishingEmail
+    | phishingEmail
+      -> user.attemptPhishing
+  }
+
+  asset ProjectManagementSoftware {
+    | projectInfo
+      -> gainInsiderKnowledge
+    | gainInsiderKnowledge
+      -> exploitInsiderKnowledge
+  }
+
+  asset NetworkAccess {
+    | deployRansomware
+      -> systemEncryption
+    | systemEncryption
+      -> impactCriticalInfrastructure
+  }
+}
+
+category Attacker {
+  asset MaliciousActor {
+    | attemptPhishing
+      -> phishingEmailSent
+    | phishingEmailSent [Exponential(0.1)]
+      -> user.attemptPhishing
+    | attemptDDoS
+      -> ddosAttack
+    | ddosAttack [Exponential(0.25)]
+      -> serviceDisruption
+    | attemptRansomware
+      -> deployRansomware
+    | deployRansomware [Exponential(0.4)]
+      -> host.deployRansomware
+  }
+}
+
+associations {
+  Network [network] 1 <-- NetworkAccess --> * [hosts] Host
+  Host [host] 1 <-- Credentials --> * [passwords] Password
+  User [user] 1 <-- Credentials --> * [passwords] Password
+  Host [host] 1 <-- Access --> * [network] Network
+  Host [bankingSystem] 1 <-- Uses --> 1 [bankingSoftware] BankingSoftware
+  Host [officeSystem] 1 <-- Uses --> 1 [officeSuite] OfficeSuite
+  Host [projectSystem] 1 <-- Uses --> 1 [projectSoftware] ProjectManagementSoftware
+}
