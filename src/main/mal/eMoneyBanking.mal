@@ -1,12 +1,17 @@
 #id: "org.mal-lang.attack-scenario"
 #version: "1.0.0"
 
+//
+
 category System {
   asset Network {
     | access
       -> hosts.connect
     & connect
   }
+
+/// here, hosts allows to connect and communicate 
+
 
   asset Host {
     | connect
@@ -43,7 +48,7 @@ category System {
       -> host.access
   }
 
-  asset Password {
+  asset Password {       // host can be authenticated and accessed once the password has been obtained
     | obtain
       -> host.authenticate
   }
@@ -53,21 +58,21 @@ category System {
       -> financialDamage
   }
 
-  asset OfficeSuite {
+  asset OfficeSuite {        //host can use the office suite for communication
     | communicate
       -> phishingEmail
     | phishingEmail
       -> user.attemptPhishing
   }
 
-  asset ProjectManagementSoftware {
+  asset ProjectManagementSoftware {    // to obtain project related information host access the project management software
     | projectInfo
       -> gainInsiderKnowledge
     | gainInsiderKnowledge
       -> exploitInsiderKnowledge
   }
 
-  asset NetworkAccess {
+  asset NetworkAccess {      //ransomware can be deployed if ransomware is accessed
     | deployRansomware
       -> systemEncryption
     | systemEncryption
@@ -75,7 +80,7 @@ category System {
   }
 }
 
-category Attacker {
+category Attacker {                            //this is the place where attackers are trying  the phishing  email
   asset MaliciousActor {
     | attemptPhishing
       -> phishingEmailSent
@@ -93,7 +98,7 @@ category Attacker {
 }
 
 associations {
-  Network [network] 1 <-- NetworkAccess --> * [hosts] Host
+  Network [network] 1 <-- NetworkAccess --> * [hosts] Host    // associations represents that network can connect to multiple hosts
   Host [host] 1 <-- Credentials --> * [passwords] Password
   User [user] 1 <-- Credentials --> * [passwords] Password
   Host [host] 1 <-- Access --> * [network] Network
