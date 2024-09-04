@@ -12,13 +12,13 @@ category AttackScenario {
       -> obtain
   }
   
-  // Password obtained, authenticate to Host
+  // Password obtained, authenticates  to the Host
   Host host {
     authenticate
       -> access
   }
   
-  // Host gains access to ERP, ePoS, Email, PharmData, NHSmail
+  // Host gains access to ERP, ePoS, Email, PharmData, NHSmail systems
   ERP erpSystem {
     access
       -> manageStock
@@ -44,13 +44,13 @@ category AttackScenario {
       -> sendSecureMessage
   }
   
-  // Host uses network to spread ransomware
+  // Host uses network to spread ransomware and infect the pharmacy  network
   Network pharmacyNetwork {
     access
       -> hosts.connect
   }
 
-  // Ransomware attack on Printer and Fax Machine
+  // Ransomware attack on Printer and Fax Machine together
   Printer printer {
     access
       -> print
@@ -61,7 +61,7 @@ category AttackScenario {
       -> sendFax
   }
 
-  // DDoS attack initiated from compromised hosts
+  // DDoS attack initiated from  is now  compromised from the hosts
   Host compromisedHost {
     access
       -> launchDDoS
@@ -75,9 +75,9 @@ category AttackScenario {
 }
 
 associations {
-  // Ransomware propagation through network
+  // Ransomware is infected   through the network
   Network [pharmacyNetwork] 1 <-- Infection --> * [infectedHosts] Host
 
-  // DDoS attack propagation from compromised hosts
+  // DDoS attack spread  from the compromised hosts
   Host [compromisedHost] * <-- DDoSLaunch --> 1 [targetNetwork] Network
 }
